@@ -1,0 +1,72 @@
+name: Public content leak check
+
+# Everything merged to the default branch of this repository is published
+# immediately on the public org profile and inherited by every HylandLabs
+# repository without its own community health files. This job fails the pull
+# request if internal references or unresolved placeholders are still present.
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan for internal references
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the pull request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fail on internal references or unresolved placeholders
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Perl-compatible regular expressions. Keep this list in sync with
+          # whatever counts as internal-only for the org.
+          #
+          # The hyland.com address pattern carries a deliberate exception for
+          # ci@hyland.com, which is the published security contact and is meant
+          # to be public. Every other hyland.com address still fails.
+          patterns=(
+            'atlassian\.net'
+            'teams\.cloud\.microsoft'
+            'teams\.microsoft\.com'
+            '(?<![A-Za-z0-9._%+-])(?!ci@hyland\.com)[A-Za-z0-9._%+-]+@hyland\.com'
+            '\b(CIX|HXNS|HXNCE|NUCLEUS|CDOKTA)-[0-9]+\b'
+            'okta\.com'
+            'spacelift\.io'
+            '\bTODO\b'
+            '\-TBD\b'
+          )
+
+          # Scan tracked files only, and never this workflow, which contains
+          # the patterns themselves.
+          mapfile -t files < <(git ls-files | grep -vx '.github/workflows/leak-check.yml' || true)
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No tracked files to scan."
+            exit 0
+          fi
+
+          failed=0
+          for pattern in "${patterns[@]}"; do
+            if matches=$(grep -InP --binary-files=without-match -- "$pattern" "${files[@]}"); then
+              echo "::error::Matched internal pattern /${pattern}/"
+              printf '%s\n' "$matches"
+              failed=1
+            fi
+          done
+
+          if [ "$failed" -ne 0 ]; then
+            echo
+            echo "This repository is public. Remove every match above before merging."
+            exit 1
+          fi
+
+          echo "No internal references or unresolved placeholders found."
