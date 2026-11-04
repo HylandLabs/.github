@@ -28,4 +28,4 @@ Contributions to a project here require signing the Hyland Contributor License A
 
 ## Reporting a Security Issue
 
-Please don't open a public issue for security problems. Report them privately to SECURITY-CONTACT-TBD. See [SECURITY.md](https://github.com/HylandLabs/.github/blob/main/SECURITY.md) for what to include and what to expect.
+Please don't open a public issue for security problems. Report them privately to ci@hyland.com. See [SECURITY.md](https://github.com/HylandLabs/.github/blob/main/SECURITY.md) for what to include and what to expect.

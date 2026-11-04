@@ -27,13 +27,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Each pattern is an extended regular expression. Keep this list in
-          # sync with whatever counts as internal-only for the org.
+          # Perl-compatible regular expressions. Keep this list in sync with
+          # whatever counts as internal-only for the org.
+          #
+          # The hyland.com address pattern carries a deliberate exception for
+          # ci@hyland.com, which is the published security contact and is meant
+          # to be public. Every other hyland.com address still fails.
           patterns=(
             'atlassian\.net'
             'teams\.cloud\.microsoft'
             'teams\.microsoft\.com'
-            '[A-Za-z0-9._%+-]+@hyland\.com'
+            '(?<![A-Za-z0-9._%+-])(?!ci@hyland\.com)[A-Za-z0-9._%+-]+@hyland\.com'
             '\b(CIX|HXNS|HXNCE|NUCLEUS|CDOKTA)-[0-9]+\b'
             'okta\.com'
             'spacelift\.io'
@@ -52,7 +56,7 @@ jobs:
 
           failed=0
           for pattern in "${patterns[@]}"; do
-            if matches=$(grep -InE --binary-files=without-match -- "$pattern" "${files[@]}"); then
+            if matches=$(grep -InP --binary-files=without-match -- "$pattern" "${files[@]}"); then
               echo "::error::Matched internal pattern /${pattern}/"
               printf '%s\n' "$matches"
               failed=1

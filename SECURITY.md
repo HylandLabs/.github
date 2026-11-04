@@ -6,7 +6,7 @@ Projects in the Hyland Labs organization are experimental and are not Hyland pro
 
 Please do not open a public issue, pull request, or discussion for a security problem.
 
-Report it privately to SECURITY-CONTACT-TBD.
+Report it privately to ci@hyland.com.
 
 Include what you can:
 
