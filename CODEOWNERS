@@ -1,0 +1,11 @@
+# Everything in this repository is published to the public org profile on merge.
+# Code-owner review is required on the default branch. See the org ruleset.
+
+*                       @HylandLabs/cix-admins @HylandLabs/cix-leads
+
+# The public org README and the inherited community health defaults carry
+# legal and open source policy weight. Add the open source review team here
+# once it exists in this org.
+/profile/README.md      @HylandLabs/cix-admins @HylandLabs/cix-leads
+/SECURITY.md            @HylandLabs/cix-admins @HylandLabs/cix-leads
+/CONTRIBUTING.md        @HylandLabs/cix-admins @HylandLabs/cix-leads
